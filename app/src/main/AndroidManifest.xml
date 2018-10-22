@@ -43,7 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Appointment"></activity>
+        <activity android:name=".Appointment" />
+        <activity android:name=".Search_Hospitals"></activity>
     </application>
 
 </manifest>

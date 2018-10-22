@@ -1,6 +1,7 @@
 package com.example.keerthan.hospitalapp;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -8,12 +9,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.keerthan.hospitalapp.Adapter.SearchAdapter;
+import com.example.keerthan.hospitalapp.Database.Database;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,7 +35,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,6 +45,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager layoutManager;
+    SearchAdapter adapter;
+
+    MaterialSearchBar materialSearchBar;
+    List<String> suggestList =new ArrayList<>();
+    Database database;
+
+
 
     private GoogleMap mMap;
     double latitude;
@@ -45,11 +63,86 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location mLastLocation;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
+    Button search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        search=(Button)findViewById(R.id.btnSearch);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MapsActivity.this, Search_Hospitals.class);
+                startActivity(intent);
+            }
+        });
+
+        recyclerView=(RecyclerView)findViewById(R.id.recycler_search);
+        layoutManager=new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+
+        materialSearchBar=(MaterialSearchBar)findViewById(R.id.search_bar);
+
+        database=new Database(this,null,null,1);
+
+        materialSearchBar.setHint("Search");
+        materialSearchBar.setCardViewElevation(10);
+        loadSuggestList();
+        materialSearchBar.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                List<String> suggest=new ArrayList<>();
+                for(String search:suggestList)
+                {
+                    if(search.toLowerCase().contains(materialSearchBar.getText().toLowerCase()))
+                        suggest.add(search);
+                }
+                materialSearchBar.setLastSuggestions(suggest);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+            @Override
+            public void onSearchStateChanged(boolean enabled) {
+                if(!enabled)
+                    recyclerView.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onSearchConfirmed(CharSequence text) {
+                startSearch(text.toString());
+
+            }
+
+            @Override
+            public void onButtonClicked(int buttonCode) {
+
+            }
+        });
+
+        adapter=new SearchAdapter(this,database.getHospitals());
+        recyclerView.setAdapter(adapter);
+
+
+
+
+
+
+
+
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -70,6 +163,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    private void startSearch(String text) {
+        adapter=new SearchAdapter(this,database.getHospitalByName(text));
+        recyclerView.setAdapter(adapter);
+    }
+
+
     private boolean CheckGooglePlayServices() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(this);
@@ -81,6 +180,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return false;
         }
         return true;
+    }
+    private void loadSuggestList(){
+        suggestList=database.getNames();
+        materialSearchBar.setLastSuggestions(suggestList);
     }
 
 
@@ -231,6 +334,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
+
 
 
             } else {

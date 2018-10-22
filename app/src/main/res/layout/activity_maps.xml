@@ -2,48 +2,78 @@
 
 <FrameLayout
 
-android:layout_width="match_parent"
-
-android:layout_height="match_parent"
-
-xmlns:android="http://schemas.android.com/apk/res/android">
-
-<fragment android:id="@+id/map"
-
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-
-    xmlns:android="http://schemas.android.com/apk/res/android"
-
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-
-    xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
 
     android:layout_height="match_parent"
-    tools:context=".MapsActivity" />
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    xmlns:tools="http://schemas.android.com/tools"
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:layout_width="match_parent"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
 
-    android:layout_height="wrap_content"
+        xmlns:tools="http://schemas.android.com/tools"
 
-    android:orientation="vertical">
+        android:id="@+id/map"
 
+        android:name="com.google.android.gms.maps.SupportMapFragment"
 
-    <Button
+        android:layout_width="match_parent"
 
-        android:id="@+id/btnHospital"
-
-        android:layout_width="wrap_content"
-
-        android:layout_height="wrap_content"
-
-        android:text="Nearby Hospitals" />
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity" />
 
 
-</LinearLayout>
+
+        <?xml version="1.0" encoding="utf-8"?>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+            xmlns:tools="http://schemas.android.com/tools"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+
+            android:orientation="vertical">
+            <Button
+
+                android:id="@+id/btnHospital"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Nearby Hospitals" />
+
+
+
+
+
+
+            <com.mancj.materialsearchbar.MaterialSearchBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/search_bar"
+                app:mt_speechMode="false"
+                app:mt_hint="Search"
+                ></com.mancj.materialsearchbar.MaterialSearchBar>
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/recycler_search"
+                android:layout_below="@+id/search_bar"
+                ></android.support.v7.widget.RecyclerView>
+            <Button
+                android:id="@+id/btnSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Search Hospital" />
+
+        </LinearLayout>
+
+
+
+
 </FrameLayout>

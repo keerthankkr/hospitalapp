@@ -29,7 +29,7 @@ public class Hospital {
         return phn_num;
     }
 
-    public void setPhn_num(long phn_num) {
+    public void setPhn_num(String phn_num) {
         this.phn_num = phn_num;
     }
 
